@@ -139,10 +139,10 @@ public:
     {
     	if (len < 100)
     	{
-                // buffer not always NULL terminated? => copy local and terminate
-                char buf[len+1];
-                memcpy(buf,message,len);
-                buf[len]='\0';
+    		// buffer not always NULL terminated? => copy local and terminate
+    		char buf[len+1];
+    		memcpy(buf,message,len);
+    		buf[len]='\0';
 
     		if (strncmp(buf, "{\"eof\" : 1}", 11) == 0)
     		{
@@ -151,7 +151,7 @@ public:
     		}
     		// dirty hack, clients send their sampling rate this way, but
     		// this is not mapped to an API in Vosk, so filter it out here
-        	else if ((len < 100) && (strstr(buf, "sample_rate") != NULL))
+        	else if (strstr(buf, "sample_rate") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
         		return Chunk{vosk_recognizer_partial_result(rec_), false};
