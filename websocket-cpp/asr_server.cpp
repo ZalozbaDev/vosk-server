@@ -186,10 +186,17 @@ public:
         if (ec)
             fail(ec, "read");
 
-        if (chunk_.stop)
-        {
-            ws_.close(beast::websocket::close_code::normal);
-
+        try {
+            if (chunk_.stop)
+            {
+                ws_.close(beast::websocket::close_code::normal);
+	
+                return;
+            }
+        } 
+        catch (boost::system::system_error &e) {
+            std::cout << "Exception trying to close websocket, error code=" << e.code() << "\n";
+			
             return;
         }
 
