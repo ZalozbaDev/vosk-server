@@ -160,7 +160,10 @@ public:
         	else if (strstr(buf, "seconds=") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
-				vosk_recognizer_set_timestamp(rec_, 0, 0);
+        		struct timeval tv;
+        		tv.tv_sec = 1;
+        		tv.tv_usec = 2;
+				vosk_recognizer_set_timestamp(rec_, &tv);
         		return Chunk{vosk_recognizer_partial_result(rec_), false};
         	}
         	else
