@@ -157,7 +157,7 @@ public:
         		return Chunk{vosk_recognizer_partial_result(rec_), false};
         	}
         	// handle the periodical timestamp
-        	else if (strstr(buf, "seconds=" }") != NULL)
+        	else if (strstr(buf, "seconds=") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
 				vosk_recognizer_set_timestamp(rec_, 0, 0);
