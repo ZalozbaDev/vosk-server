@@ -17,6 +17,7 @@
 #include <thread>
 #include <vector>
 #include <string_view>
+#include <regex>
 
 #include "vosk_api.h"
 
@@ -160,10 +161,20 @@ public:
         	else if (strstr(buf, "seconds=") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
+        		// need a parser for this string: "seconds=XXXX,milli=YYYY"
         		struct timeval tv;
-        		tv.tv_sec = 1;
-        		tv.tv_usec = 2;
-				vosk_recognizer_set_timestamp(rec_, &tv);
+        		std::regex pattern("(seconds)=(\\d+),(milli)=(\\d+)");
+        		std::smatch matches;
+        		if (std::regex_match(buf, matches, pattern)) 
+        		{
+        			tv.tv_sec = std::stoi(matches[2].str());
+        			tv.tv_usec = std::stoi(matches[4].str()) * 1000;
+        			vosk_recognizer_set_timestamp(rec_, &tv);
+        		}
+        		else
+        		{
+        			std::cout << "Error! Not sending timestamp (parsing message failed)." << std::endl; 
+        		}
         		return Chunk{vosk_recognizer_partial_result(rec_), false};
         	}
         	else
