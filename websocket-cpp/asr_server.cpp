@@ -165,7 +165,7 @@ public:
         		struct timeval tv;
         		std::regex pattern("(seconds)=(\\d+),(milli)=(\\d+)");
         		std::smatch matches;
-        		if (std::regex_match(buf, matches, pattern)) 
+        		if (std::regex_match(std::string(buf, len), matches, pattern)) 
         		{
         			tv.tv_sec = std::stoi(matches[2].str());
         			tv.tv_usec = std::stoi(matches[4].str()) * 1000;
