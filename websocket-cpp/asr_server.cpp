@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
     }
     if (const char *env_p = std::getenv("VOSK_SHOW_WORDS"))
     {
-        args.show_words = strcmp(env_p, "True") == 0;
+        args.show_words = strcasecmp(env_p, "true") == 0;
     }
     // The io_context is required for all I/O
     net::io_context ioc{threads};
