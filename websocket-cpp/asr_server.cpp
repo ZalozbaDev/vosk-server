@@ -222,7 +222,7 @@ public:
             return;
         }
 
-        const char *buf = boost::asio::buffer_cast<const char *>(buffer_.cdata());
+        const char *buf = static_cast< const char*>(buffer_.data().data());
         int len = static_cast<int>(buffer_.size());
         chunk_ = process_chunk(buf, len);
 
