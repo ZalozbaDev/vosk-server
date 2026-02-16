@@ -155,6 +155,18 @@ public:
         	else if (strstr(buf, "sample_rate") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
+        		std::regex pattern("(sample_rate)=(\\d+)");
+        		std::smatch matches;
+        		std::string bufToMatch = std::string(buf, len);
+        		if (std::regex_match(bufToMatch, matches, pattern)) 
+        		{
+        			float srate = std::stof(matches[2].str());
+        			vosk_recognizer_set_sample_rate(rec_, srate);
+        		}
+        		else
+        		{
+        			std::cout << "Error! Not sending sample rate (parsing message failed)." << std::endl; 
+        		}
         		return Chunk{vosk_recognizer_partial_result(rec_), false};
         	}
         	// handle the periodical timestamp
