@@ -155,13 +155,14 @@ public:
         	else if (strstr(buf, "sample_rate") != NULL)
         	{
         		std::cout << "msglen=" << len << "msg=" << buf << "\n";
-        		std::regex pattern("(sample_rate)=(\\d+)");
+        		std::regex pattern("(sample_rate)=(\\d+),(buffer_size)=(\\d+)");
         		std::smatch matches;
         		std::string bufToMatch = std::string(buf, len);
         		if (std::regex_match(bufToMatch, matches, pattern)) 
         		{
         			float srate = std::stof(matches[2].str());
         			vosk_recognizer_set_sample_rate(rec_, srate);
+        			// TBD could do sth with client buffer size in the future?
         		}
         		else
         		{
