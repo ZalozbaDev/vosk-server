@@ -136,6 +136,59 @@ public:
                 shared_from_this()));
     }
 
+    /**
+     *
+     * Document in-band config messages.
+     *
+     ***************************************
+     *
+     * Standardized/supported messages:
+     *
+     * { "eof" : 1}
+     * Processing can be stopped, no more audio will be received. 
+     *
+     * { "config" : { "sample_rate" : 48000 } }
+     * Set (different) sample rate (than specified on startup).
+     *
+     * { "config" : { "model" : string } }
+     * model (path?) runtime config
+     *
+     * { "config" : { "words" : bool } }
+     * vosk_show_words runtime config
+     *
+     ***************************************
+     *
+     * Custom messages:
+     *
+     * { "config" : { "sample_format" : string } }
+     * "PCMS16LE" (default)
+     * "ULAW" (only when sample rate is set to 8 kHz (telephony audio))
+     *
+     * { "config" : { "chunklen" : integer } }
+     * announce typical waveform data packet length 
+     * same parameter than "accept_waveform" (here: length in bytes)
+     * used as a hint for VAD processing only
+     *
+     * { "ts" : { "s" : integer, "ms" : integer } }
+     * client timestamp for audio packets
+     * if provided, will be used instead of server time for returned results
+     * "s": seconds since Jan 1st 1970
+     * "ms": 0..999
+     *
+     ***************************************
+     *
+     * Standardized/defined but unsupported messages:
+     *
+     * { "reset" : 1}
+     * Flush recognizer but do not stop processing.
+     *
+     * { "config" : { "max_alternatives" : integer } }
+     * vosk_set_max_alternatives runtime config
+     *
+     * { "config" : { "phrase_list" : string } }
+     * set a new grammar as JSON list of strings --> ["bla blubb", "huhu", "[unk]"]
+     *
+     */
     Chunk process_chunk(const char *message, int len)
     {
     	if (len < 100)
