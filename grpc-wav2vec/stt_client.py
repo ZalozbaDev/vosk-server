@@ -12,7 +12,7 @@ def gen(audio_file_name):
     specification = stt_service_pb2.RecognitionSpec(
         partial_results=True,
         audio_encoding='LINEAR16_PCM',
-        sample_rate_hertz=8000,
+        sample_rate_hertz=16000,
         enable_word_time_offsets=True,
         max_alternatives=5,
     )
@@ -53,6 +53,7 @@ def run(audio_file_name):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', required=True, help='audio file path')
+    parser.add_argument('--job', required=False, help='job id')
     args = parser.parse_args()
 
     run(args.path)
