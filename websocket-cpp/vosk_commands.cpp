@@ -76,6 +76,22 @@ bool VoskCommands::parseCommand(const char *message, int len)
 				words = parser_res["config"]["words"].get<bool>();
 			}
 		}
+		
+		// sample_format
+		if (parser_res["config"].contains("sample_format"))
+		{
+			format = SampleFormat::PCMS16LE;
+			
+			if (parser_res["config"]["sample_format"].is_string())
+			{
+				if (parser_res["config"]["sample_format"].get<std::string>() == "ULAW")
+				{
+					format = SampleFormat::ULAW;
+				}
+			}
+		}
+
+
 	}
 	
 	// check for eof
@@ -93,6 +109,7 @@ void VoskCommands::resetValues()
 	sample_rate = -1.0f;
 	model.erase();
 	words = false;
+	format = SampleFormat::PCMS16LE;
 }
 
 //////////////////////////////////////////////////////

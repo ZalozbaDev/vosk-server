@@ -122,5 +122,17 @@ TEST_CASE("API tests")
 		CHECK(cmds.getWords() == false);
 	}
 
+	SUBCASE("test config --> sample_format") {
+		const char testMsg[] = "{ \"config\" : { \"sample_format\" : \"ULAW\" }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getSampleFormat() == SampleFormat::ULAW);
+	}
+
+	SUBCASE("test config --> sample_format") {
+		const char testMsg[] = "{ \"config\" : { \"sample_format\" : \"PCMS16LE\" }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getSampleFormat() == SampleFormat::PCMS16LE);
+	}
+
 	
 }

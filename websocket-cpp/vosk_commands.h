@@ -5,6 +5,11 @@
 
 using json = nlohmann::json;
 
+enum class SampleFormat {
+    PCMS16LE,  // 16-bit PCM, signed endian
+    ULAW      // μ-law encoding
+};
+
 class VoskCommands
 {
 public:
@@ -14,6 +19,7 @@ public:
 	float getSampleRate() { return sample_rate; }
 	std::string getModel() { return model; }
 	bool getWords() { return words; }
+	SampleFormat getSampleFormat() { return format; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -24,6 +30,7 @@ private:
 	float sample_rate;
 	std::string model;
 	bool words;
+	SampleFormat format;
 };
 
 
