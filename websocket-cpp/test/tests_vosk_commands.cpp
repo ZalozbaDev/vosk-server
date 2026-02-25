@@ -68,3 +68,36 @@ TEST_CASE("test buffer parsing")
 
 }
 
+TEST_CASE("API tests")
+{
+	VoskCommands cmds;
+	
+	SUBCASE("test EOF again") {
+		const char testMsg[] = "{\"eof\":1}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == true);
+	}
+
+	SUBCASE("test config --> sample_rate") {
+		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : 16000 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getSampleRate() == 16000.0f);
+	}
+
+	SUBCASE("test config --> sample_rate (invalid)") {
+		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : \"murks\" }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getSampleRate() == -1.0f);
+	}
+
+	SUBCASE("test config --> model") {
+		const char testMsg[] = "{ \"config\" : { \"model\" : \"test.ggml\" }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getSampleRate() == -1.0f);
+		CHECK(cmds.getModel() == "test.ggml");
+	}
+
+}

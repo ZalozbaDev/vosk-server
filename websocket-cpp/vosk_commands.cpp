@@ -1,6 +1,7 @@
 #include "vosk_commands.h"
 
 #include <cstddef>
+#include <iostream>
 
 //////////////////////////////////////////////////////
 VoskCommands::VoskCommands()
@@ -40,8 +41,37 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	// reset all values before checking 
 	resetValues();
 	
+	// time stamp likely to be most frequent message
+	
+	// check for several config settings
+	if (parser_res.contains("config"))
+	{
+		// sample_rate
+		if (parser_res["config"].contains("sample_rate"))
+		{
+			if (parser_res["config"]["sample_rate"].is_number_integer())
+			{
+				sample_rate = (float) (parser_res["config"]["sample_rate"].get<int>());
+			}
+			else
+			{
+				sample_rate = -1.0f;
+			}
+		}
+		
+		// model
+		if (parser_res["config"].contains("model"))
+		{
+			if (parser_res["config"]["model"].is_string())
+			{
+				model = parser_res["config"]["model"].get<std::string>();
+			}
+		}
+	}
+	
 	// check for eof
 	eof = (parser_res.value("eof", 0) == 1) ? true : false;
+	
 	
 	
 	return true;
@@ -51,6 +81,8 @@ bool VoskCommands::parseCommand(const char *message, int len)
 void VoskCommands::resetValues()
 {
 	eof = false;
+	sample_rate = -1.0f;
+	model = "";
 }
 
 //////////////////////////////////////////////////////

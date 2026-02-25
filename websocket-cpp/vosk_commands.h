@@ -11,6 +11,8 @@ public:
 	VoskCommands();
 	bool parseCommand(const char *message, int len);
 	bool isEof() { return eof; }
+	float getSampleRate() { return sample_rate; }
+	std::string getModel() { return model; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -18,6 +20,8 @@ private:
 	const static int max_cmd_len = 100;
 	
 	bool eof;
+	float sample_rate;
+	std::string model;
 };
 
 
