@@ -10,6 +10,13 @@ enum class SampleFormat {
     ULAW      // μ-law encoding
 };
 
+struct audio_timestamp
+{
+	bool valid;
+	uint64_t seconds;
+	uint64_t milliseconds;
+};
+
 class VoskCommands
 {
 public:
@@ -21,6 +28,7 @@ public:
 	bool getWords() { return words; }
 	SampleFormat getSampleFormat() { return format; }
 	unsigned int getChunklen() { return chunklen; }
+	audio_timestamp getAudioTimestamp() { return timestamp; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -33,6 +41,7 @@ private:
 	bool words;
 	SampleFormat format;
 	unsigned int chunklen;
+	audio_timestamp timestamp;
 };
 
 

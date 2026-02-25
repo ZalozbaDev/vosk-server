@@ -42,7 +42,20 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	resetValues();
 	
 	// time stamp likely to be most frequent message
-	// TBD
+	if (parser_res.contains("ts"))
+	{
+		timestamp.valid = false;
+		
+		if ((parser_res["ts"].contains("s")) && (parser_res["ts"].contains("ms")))
+		{
+			if ((parser_res["ts"]["s"].is_number_unsigned()) && (parser_res["ts"]["ms"].is_number_unsigned()))
+			{
+				timestamp.seconds = parser_res["ts"]["s"].get<unsigned int>();
+				timestamp.milliseconds = parser_res["ts"]["ms"].get<unsigned int>();
+				timestamp.valid = true;
+			}
+		}
+	}
 	
 	// check for several config settings
 	if (parser_res.contains("config"))
@@ -111,8 +124,6 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	// check for eof
 	eof = (parser_res.value("eof", 0) == 1) ? true : false;
 	
-	
-	
 	return true;
 }
 
@@ -125,6 +136,7 @@ void VoskCommands::resetValues()
 	words = false;
 	format = SampleFormat::PCMS16LE;
 	chunklen = std::numeric_limits<unsigned int>::max();
+	timestamp.valid = false;
 }
 
 //////////////////////////////////////////////////////

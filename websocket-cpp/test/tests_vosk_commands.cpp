@@ -146,5 +146,35 @@ TEST_CASE("API tests")
 		CHECK(cmds.getChunklen() == std::numeric_limits<unsigned int>::max());
 	}
 
+	SUBCASE("test timestamp") {
+		const char testMsg[] = "{ \"ts\" : { \"s\" : 12234567, \"ms\" : 354 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		audio_timestamp ts = cmds.getAudioTimestamp();
+		CHECK(ts.valid == true);
+		CHECK(ts.seconds == 12234567);
+		CHECK(ts.milliseconds == 354);
+	}
+
+	SUBCASE("test timestamp (invalid)") {
+		const char testMsg[] = "{ \"ts\" : { \"s\" : 12234567, \"ms\" : -354 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		audio_timestamp ts = cmds.getAudioTimestamp();
+		CHECK(ts.valid == false);
+	}
+
+	SUBCASE("check valid json without any recognized option") {
+		const char testMsg[] = "{ \"hallo\" : { \"huhu\" : \"hier\"}}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		
+		// all values default
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getSampleRate() == -1.0f);
+		CHECK(cmds.getModel().length() == 0);
+		CHECK(cmds.getWords() == false);
+		CHECK(cmds.getSampleFormat() == SampleFormat::PCMS16LE);
+		CHECK(cmds.getChunklen() == std::numeric_limits<unsigned int>::max());
+		audio_timestamp ts = cmds.getAudioTimestamp();
+		CHECK(ts.valid == false);
+	}
 	
 }
