@@ -67,6 +67,15 @@ bool VoskCommands::parseCommand(const char *message, int len)
 				model = parser_res["config"]["model"].get<std::string>();
 			}
 		}
+
+		// words
+		if (parser_res["config"].contains("words"))
+		{
+			if (parser_res["config"]["words"].is_boolean())
+			{
+				words = parser_res["config"]["words"].get<bool>();
+			}
+		}
 	}
 	
 	// check for eof
@@ -82,7 +91,8 @@ void VoskCommands::resetValues()
 {
 	eof = false;
 	sample_rate = -1.0f;
-	model = "";
+	model.erase();
+	words = false;
 }
 
 //////////////////////////////////////////////////////

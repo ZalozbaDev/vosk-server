@@ -13,6 +13,7 @@ public:
 	bool isEof() { return eof; }
 	float getSampleRate() { return sample_rate; }
 	std::string getModel() { return model; }
+	bool getWords() { return words; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -22,6 +23,7 @@ private:
 	bool eof;
 	float sample_rate;
 	std::string model;
+	bool words;
 };
 
 

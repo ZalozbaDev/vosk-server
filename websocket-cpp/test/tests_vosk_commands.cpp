@@ -97,7 +97,30 @@ TEST_CASE("API tests")
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
 		CHECK(cmds.isEof() == false);
 		CHECK(cmds.getSampleRate() == -1.0f);
+		// std::cout << "Model: '" << cmds.getModel() << "'" << std::endl;
 		CHECK(cmds.getModel() == "test.ggml");
 	}
 
+	SUBCASE("test config --> words") {
+		const char testMsg[] = "{ \"config\" : { \"words\" : true }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getSampleRate() == -1.0f);
+		// std::cout << "Model: '" << cmds.getModel() << "', length=" << cmds.getModel().length() << std::endl;
+		CHECK(cmds.getModel().length() == 0);
+		CHECK(cmds.getWords() == true);
+	}
+
+	SUBCASE("test config --> words (invalid value)") {
+		const char testMsg[] = "{ \"config\" : { \"words\" : True }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == false);
+	}
+
+	SUBCASE("test config --> words") {
+		const char testMsg[] = "{ \"config\" : { \"words\" : false }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getWords() == false);
+	}
+
+	
 }
