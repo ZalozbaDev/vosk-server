@@ -51,6 +51,19 @@ TEST_CASE("test buffer parsing")
 	SUBCASE("test valid msg") {
 		const char testMsg[] = "{ \"eof\": 1}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == true);
+	}
+
+	SUBCASE("test valid msg but unexpected value") {
+		const char testMsg[] = "{ \"eof\": 15}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
+	}
+
+	SUBCASE("test valid msg but unexpected value") {
+		const char testMsg[] = "{ \"eof\": 0}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.isEof() == false);
 	}
 
 }

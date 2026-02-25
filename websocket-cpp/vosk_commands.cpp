@@ -38,12 +38,19 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	}
 	
 	// reset all values before checking 
+	resetValues();
 	
-	
-	
+	// check for eof
+	eof = (parser_res.value("eof", 0) == 1) ? true : false;
 	
 	
 	return true;
+}
+
+//////////////////////////////////////////////////////
+void VoskCommands::resetValues()
+{
+	eof = false;
 }
 
 //////////////////////////////////////////////////////

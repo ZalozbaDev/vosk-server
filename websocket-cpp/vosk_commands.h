@@ -10,10 +10,14 @@ class VoskCommands
 public:
 	VoskCommands();
 	bool parseCommand(const char *message, int len);
+	bool isEof() { return eof; }
 	~VoskCommands();
 private:
+	void resetValues();
 	
 	const static int max_cmd_len = 100;
+	
+	bool eof;
 };
 
 
