@@ -21,5 +21,35 @@ TEST_CASE("test buffer parsing")
 		CHECK(VoskCommands::isCommand(longMsg, 101) == false);
 	}
 
+	SUBCASE("test short message") {
+		const char shortMsg[8] = {0};	
+		CHECK(VoskCommands::isCommand(shortMsg, sizeof(shortMsg)) == false);
+	}
+
+	SUBCASE("test invalid message") {
+		const char testMsg[9] = {-0x07};	
+		CHECK(VoskCommands::isCommand(testMsg, sizeof(testMsg)) == false);
+	}
+
+	SUBCASE("test too many spaces") {
+		const char testMsg[9] = {0x20};	
+		CHECK(VoskCommands::isCommand(testMsg, sizeof(testMsg)) == false);
+	}
+
+	SUBCASE("test invalid string") {
+		const char testMsg[] = "sample_rate=";	
+		CHECK(VoskCommands::isCommand(testMsg, sizeof(testMsg)) == false);
+	}
+
+	SUBCASE("test no closing bracket") {
+		const char testMsg[] = "{ \"eof\": 1";	
+		CHECK(VoskCommands::isCommand(testMsg, sizeof(testMsg)) == false);
+	}
+
+	SUBCASE("test valid msg") {
+		const char testMsg[] = "{ \"eof\": 1}";	
+		CHECK(VoskCommands::isCommand(testMsg, sizeof(testMsg)) == true);
+	}
+
 }
 

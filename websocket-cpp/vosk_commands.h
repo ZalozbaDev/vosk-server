@@ -1,6 +1,10 @@
 #ifndef VOSK_COMMANDS_H
 #define VOSK_COMMANDS_H
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 class VoskCommands
 {
 public:
