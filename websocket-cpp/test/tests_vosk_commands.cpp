@@ -10,11 +10,15 @@
 #include <fstream>
 #include <vector>
 
-TEST_CASE("test EOF command")
+#include "vosk_commands.h"
+
+TEST_CASE("test buffer parsing")
 {
-	SUBCASE("test single EOF message") {
+	SUBCASE("test long message") {
+		const char longMsg[200] = {0};	
+		CHECK(VoskCommands::isCommand(longMsg, sizeof(longMsg)) == false);
 		
-		std::cout << "Hello world!" << std::endl;
+		CHECK(VoskCommands::isCommand(longMsg, 101) == false);
 	}
 
 }
