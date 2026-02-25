@@ -20,6 +20,7 @@ public:
 	std::string getModel() { return model; }
 	bool getWords() { return words; }
 	SampleFormat getSampleFormat() { return format; }
+	unsigned int getChunklen() { return chunklen; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -31,6 +32,7 @@ private:
 	std::string model;
 	bool words;
 	SampleFormat format;
+	unsigned int chunklen;
 };
 
 

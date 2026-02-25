@@ -134,5 +134,17 @@ TEST_CASE("API tests")
 		CHECK(cmds.getSampleFormat() == SampleFormat::PCMS16LE);
 	}
 
+	SUBCASE("test config --> chunklen") {
+		const char testMsg[] = "{ \"config\" : { \"chunklen\" : 4096 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getChunklen() == 4096);
+	}
+
+	SUBCASE("test config --> chunklen (invalid)") {
+		const char testMsg[] = "{ \"config\" : { \"chunklen\" : -20 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getChunklen() == std::numeric_limits<unsigned int>::max());
+	}
+
 	
 }

@@ -42,6 +42,7 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	resetValues();
 	
 	// time stamp likely to be most frequent message
+	// TBD
 	
 	// check for several config settings
 	if (parser_res.contains("config"))
@@ -91,7 +92,20 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			}
 		}
 
-
+		// chunklen
+		if (parser_res["config"].contains("chunklen"))
+		{
+			if (parser_res["config"]["chunklen"].is_number_unsigned())
+			{
+				chunklen = parser_res["config"]["chunklen"].get<unsigned int>();
+			}
+			else
+			{
+				chunklen = std::numeric_limits<unsigned int>::max();
+			}
+		}
+		
+		
 	}
 	
 	// check for eof
@@ -110,6 +124,7 @@ void VoskCommands::resetValues()
 	model.erase();
 	words = false;
 	format = SampleFormat::PCMS16LE;
+	chunklen = std::numeric_limits<unsigned int>::max();
 }
 
 //////////////////////////////////////////////////////
