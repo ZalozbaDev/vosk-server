@@ -8,10 +8,10 @@ using json = nlohmann::json;
 class VoskCommands
 {
 public:
-	static bool isCommand(const char *message, int len);
+	VoskCommands();
+	bool parseCommand(const char *message, int len);
 	~VoskCommands();
 private:
-	VoskCommands();
 	
 	const static int max_cmd_len = 100;
 };

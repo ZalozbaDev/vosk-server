@@ -3,7 +3,13 @@
 #include <cstddef>
 
 //////////////////////////////////////////////////////
-bool VoskCommands::isCommand(const char *message, int len)
+VoskCommands::VoskCommands()
+{
+	
+}
+
+//////////////////////////////////////////////////////
+bool VoskCommands::parseCommand(const char *message, int len)
 {
 	// first decision must be fast, base it simply on buffer length
 	// filter out too short packets too (EOF packet is the shortest)
@@ -21,12 +27,28 @@ bool VoskCommands::isCommand(const char *message, int len)
 		return false;
 	}
 	
-	// this buffer is a candidate for processing, now we can try if it parses properly
-	
+	// parse now
 	// the parser can handle non-null terminated strings, no need to check for trailing 0
 	json parser_res = json::parse(message, message + len, nullptr, false);
 	
-	// simply return parser result
-	return !parser_res.is_discarded();
+	// return parser failure
+	if (parser_res.is_discarded()) 
+	{
+		return false;
+	}
+	
+	// reset all values before checking 
+	
+	
+	
+	
+	
+	return true;
+}
+
+//////////////////////////////////////////////////////
+VoskCommands::~VoskCommands()
+{
+	
 }
 
