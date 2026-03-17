@@ -20,6 +20,7 @@
 #include <regex>
 
 #include "vosk_api.h"
+#include "vosk_commands.h"
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -57,6 +58,7 @@ class session : public std::enable_shared_from_this<session>
     VoskRecognizer *rec_;
     Chunk chunk_;
     Args args_;
+    VoskCommands cmds_;
 
 public:
     // Take ownership of the socket
@@ -191,8 +193,77 @@ public:
      */
     Chunk process_chunk(const char *message, int len)
     {
-    	if (len < 100)
+    	bool jsonCommand = cmds_.parseCommand(message, len);
+    	if (jsonCommand == true)
     	{
+    		// JSON commands parser (new)
+    		
+    		std::bitset<9> valids = getValids();
+    		
+    		// check all supported options and call appropriate APIs
+    		
+    		// frequent messages first
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::TIMESTAMP)) == true)
+    		{
+    			audio_timestamp ts = cmds.getAudioTimestamp();
+    			struct timeval tv;
+    			tv.tv_sec  = ts.seconds;
+    			tv.tv_usec = ts.milliseconds * 1000;
+    			std::cout << "JSON Config: timestamp=" << tv.tv_sec "s " << tv.tv_usec << "us" << std::endl;
+    			vosk_recognizer_set_timestamp(rec_, &tv);
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == true)
+    		{
+    			std::cout << "JSON Config: EOF=1" << std::endl;
+    			return Chunk{vosk_recognizer_final_result(rec_), true};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE)) == true)
+    		{
+    			float srate = cmds_.getSampleRate();
+    			std::cout << "JSON Config: srate=" << srate << std::endl;
+    			vosk_recognizer_set_sample_rate(rec_, srate);
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::MODEL)) == true)
+    		{
+    			std::string model = cmds_.getModel();
+    			std::cout << "JSON Config: model=" << model << " (ignored)" << std::endl;
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::WORDS)) == true)
+    		{
+    			bool words = cmds_.getWords();
+    			std::cout << "JSON Config: words=" << words << std::endl;
+    			vosk_recognizer_set_words(rec_, (words == true) ? 1 : 0);
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::FORMAT)) == true)
+    		{
+    			SampleFormat fmt = cmds_.getSampleFormat();
+    			std::cout << "JSON Config: format=" << fmt << std::endl;
+    			vosk_recognizer_set_sample_format(rec_, (fmt == SampleFormat::ULAW) ? "ULAW" : "PCMS16LE"); 
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::CHUNKLEN)) == true)
+    		{
+    			int chunkLen = cmds_.getChunklen();
+    			std::cout << "JSON Config: chunklen=" << chunkLen << std::endl;
+    			vosk_recognizer_set_waveform_chunklen(rec_, chunkLen); 
+    			return Chunk{vosk_recognizer_partial_result(rec_), false};
+    		}
+    		
+    	}
+    	else if (len < 100)
+    	{
+    		// legacy command parser (to be removed eventually) 
+    		
     		// buffer not always NULL terminated? => copy local and terminate
     		char buf[len+1];
     		memcpy(buf,message,len);
