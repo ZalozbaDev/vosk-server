@@ -70,6 +70,12 @@ bool VoskCommands::parseCommand(const char *message, int len)
 				sample_rate = (float) (parser_res["config"]["sample_rate"].get<int>());
 				valids.set(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE));
 			}
+			else if (parser_res["config"]["sample_rate"].is_number_float())
+			{
+				// JITSI workaround, sample rate is sent as float (API not well defined)
+				sample_rate = parser_res["config"]["sample_rate"].get<float>();
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE));
+			}
 			else
 			{
 				sample_rate = -1.0f;

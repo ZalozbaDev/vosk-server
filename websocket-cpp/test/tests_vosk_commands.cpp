@@ -94,6 +94,16 @@ TEST_CASE("API tests")
 		CHECK(cmds.getSampleRate() == 16000.0f);
 	}
 
+	SUBCASE("test config --> sample_rate (float)") {
+		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : 48000.0 }}";	
+		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == false);
+		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE)) == true);
+		CHECK(cmds.getSampleRate() == 48000.0f);
+	}
+
 	SUBCASE("test config --> sample_rate (invalid)") {
 		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : \"murks\" }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
