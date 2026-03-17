@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////
 VoskCommands::VoskCommands()
 {
-	
+	valids.reset();
 }
 
 //////////////////////////////////////////////////////
@@ -53,6 +53,8 @@ bool VoskCommands::parseCommand(const char *message, int len)
 				timestamp.seconds = parser_res["ts"]["s"].get<unsigned int>();
 				timestamp.milliseconds = parser_res["ts"]["ms"].get<unsigned int>();
 				timestamp.valid = true;
+				
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::TIMESTAMP));
 			}
 		}
 	}
@@ -66,6 +68,7 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			if (parser_res["config"]["sample_rate"].is_number_integer())
 			{
 				sample_rate = (float) (parser_res["config"]["sample_rate"].get<int>());
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE));
 			}
 			else
 			{
@@ -79,6 +82,7 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			if (parser_res["config"]["model"].is_string())
 			{
 				model = parser_res["config"]["model"].get<std::string>();
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::MODEL));
 			}
 		}
 
@@ -88,6 +92,7 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			if (parser_res["config"]["words"].is_boolean())
 			{
 				words = parser_res["config"]["words"].get<bool>();
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::WORDS));
 			}
 		}
 		
@@ -102,6 +107,8 @@ bool VoskCommands::parseCommand(const char *message, int len)
 				{
 					format = SampleFormat::ULAW;
 				}
+				
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::FORMAT));
 			}
 		}
 
@@ -111,6 +118,7 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			if (parser_res["config"]["chunklen"].is_number_unsigned())
 			{
 				chunklen = parser_res["config"]["chunklen"].get<unsigned int>();
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::CHUNKLEN));
 			}
 			else
 			{
@@ -122,7 +130,12 @@ bool VoskCommands::parseCommand(const char *message, int len)
 	}
 	
 	// check for eof
-	eof = (parser_res.value("eof", 0) == 1) ? true : false;
+	eof = false;
+	if (parser_res.value("eof", 0) == 1)
+	{
+		eof = true;
+		valids.set(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF));
+	}
 	
 	return true;
 }
@@ -137,6 +150,8 @@ void VoskCommands::resetValues()
 	format = SampleFormat::PCMS16LE;
 	chunklen = std::numeric_limits<unsigned int>::max();
 	timestamp.valid = false;
+	
+	valids.reset();
 }
 
 //////////////////////////////////////////////////////

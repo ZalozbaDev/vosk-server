@@ -1,6 +1,8 @@
 #ifndef VOSK_COMMANDS_H
 #define VOSK_COMMANDS_H
 
+#include <bitset>
+
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -17,6 +19,18 @@ struct audio_timestamp
 	uint64_t milliseconds;
 };
 
+enum class ValidBitsPositions {
+	VOSK_EOF    = 0,
+	SAMPLE_RATE = 1,
+	MODEL       = 2,
+	WORDS       = 3,
+	FORMAT      = 4,
+	CHUNKLEN    = 5,
+	TIMESTAMP   = 6,
+	LM_MODEL    = 7, // RFU
+	VAD_PROPS   = 8  // RFU
+};
+
 class VoskCommands
 {
 public:
@@ -29,6 +43,7 @@ public:
 	SampleFormat getSampleFormat() { return format; }
 	unsigned int getChunklen() { return chunklen; }
 	audio_timestamp getAudioTimestamp() { return timestamp; }
+	std::bitset<9> getValids() { return valids; }
 	~VoskCommands();
 private:
 	void resetValues();
@@ -42,6 +57,8 @@ private:
 	SampleFormat format;
 	unsigned int chunklen;
 	audio_timestamp timestamp;
+	
+	std::bitset<9> valids;
 };
 
 

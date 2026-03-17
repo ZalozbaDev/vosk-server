@@ -57,12 +57,16 @@ TEST_CASE("test buffer parsing")
 	SUBCASE("test valid msg but unexpected value") {
 		const char testMsg[] = "{ \"eof\": 15}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == false);
 		CHECK(cmds.isEof() == false);
 	}
 
 	SUBCASE("test valid msg but unexpected value") {
 		const char testMsg[] = "{ \"eof\": 0}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == false);
 		CHECK(cmds.isEof() == false);
 	}
 
@@ -75,26 +79,36 @@ TEST_CASE("API tests")
 	SUBCASE("test EOF again") {
 		const char testMsg[] = "{\"eof\":1}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == true);
 		CHECK(cmds.isEof() == true);
 	}
 
 	SUBCASE("test config --> sample_rate") {
 		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : 16000 }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == false);
 		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE)) == true);
 		CHECK(cmds.getSampleRate() == 16000.0f);
 	}
 
 	SUBCASE("test config --> sample_rate (invalid)") {
 		const char testMsg[] = "{ \"config\" : { \"sample_rate\" : \"murks\" }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::VOSK_EOF)) == false);
 		CHECK(cmds.isEof() == false);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::SAMPLE_RATE)) == false);
 		CHECK(cmds.getSampleRate() == -1.0f);
 	}
 
 	SUBCASE("test config --> model") {
 		const char testMsg[] = "{ \"config\" : { \"model\" : \"test.ggml\" }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::MODEL)) == true);
 		CHECK(cmds.isEof() == false);
 		CHECK(cmds.getSampleRate() == -1.0f);
 		// std::cout << "Model: '" << cmds.getModel() << "'" << std::endl;
@@ -104,6 +118,8 @@ TEST_CASE("API tests")
 	SUBCASE("test config --> words") {
 		const char testMsg[] = "{ \"config\" : { \"words\" : true }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::WORDS)) == true);
 		CHECK(cmds.isEof() == false);
 		CHECK(cmds.getSampleRate() == -1.0f);
 		// std::cout << "Model: '" << cmds.getModel() << "', length=" << cmds.getModel().length() << std::endl;
@@ -113,42 +129,55 @@ TEST_CASE("API tests")
 
 	SUBCASE("test config --> words (invalid value)") {
 		const char testMsg[] = "{ \"config\" : { \"words\" : True }}";	
+		CHECK(cmds.getValids().count() == 0);
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == false);
 	}
 
 	SUBCASE("test config --> words") {
 		const char testMsg[] = "{ \"config\" : { \"words\" : false }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::WORDS)) == true);
 		CHECK(cmds.getWords() == false);
 	}
 
 	SUBCASE("test config --> sample_format") {
 		const char testMsg[] = "{ \"config\" : { \"sample_format\" : \"ULAW\" }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::FORMAT)) == true);
 		CHECK(cmds.getSampleFormat() == SampleFormat::ULAW);
 	}
 
 	SUBCASE("test config --> sample_format") {
 		const char testMsg[] = "{ \"config\" : { \"sample_format\" : \"PCMS16LE\" }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::FORMAT)) == true);
 		CHECK(cmds.getSampleFormat() == SampleFormat::PCMS16LE);
 	}
 
 	SUBCASE("test config --> chunklen") {
 		const char testMsg[] = "{ \"config\" : { \"chunklen\" : 4096 }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::CHUNKLEN)) == true);
 		CHECK(cmds.getChunklen() == 4096);
 	}
 
 	SUBCASE("test config --> chunklen (invalid)") {
 		const char testMsg[] = "{ \"config\" : { \"chunklen\" : -20 }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::CHUNKLEN)) == false);
 		CHECK(cmds.getChunklen() == std::numeric_limits<unsigned int>::max());
 	}
 
 	SUBCASE("test timestamp") {
 		const char testMsg[] = "{ \"ts\" : { \"s\" : 12234567, \"ms\" : 354 }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 1);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::TIMESTAMP)) == true);
 		audio_timestamp ts = cmds.getAudioTimestamp();
 		CHECK(ts.valid == true);
 		CHECK(ts.seconds == 12234567);
@@ -158,6 +187,8 @@ TEST_CASE("API tests")
 	SUBCASE("test timestamp (invalid)") {
 		const char testMsg[] = "{ \"ts\" : { \"s\" : 12234567, \"ms\" : -354 }}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
+		CHECK(cmds.getValids().test(static_cast<std::size_t>(ValidBitsPositions::TIMESTAMP)) == false);
 		audio_timestamp ts = cmds.getAudioTimestamp();
 		CHECK(ts.valid == false);
 	}
@@ -165,6 +196,7 @@ TEST_CASE("API tests")
 	SUBCASE("check valid json without any recognized option") {
 		const char testMsg[] = "{ \"hallo\" : { \"huhu\" : \"hier\"}}";	
 		CHECK(cmds.parseCommand(testMsg, sizeof(testMsg)) == true);
+		CHECK(cmds.getValids().count() == 0);
 		
 		// all values default
 		CHECK(cmds.isEof() == false);
