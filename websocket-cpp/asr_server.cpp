@@ -288,7 +288,18 @@ public:
         		{
         			float srate = std::stof(matches[2].str());
         			vosk_recognizer_set_sample_rate(rec_, srate);
-        			// TBD could do sth with client buffer size in the future?
+        			int bufsize = std::stoi(matches[4].str());
+        			vosk_recognizer_set_waveform_chunklen(rec_, bufsize);
+        			
+        			// hard-code sample format here (HACK!)
+        			if (srate == 8000.0f)
+        			{
+        				vosk_recognizer_set_sample_format(rec_, "ULAW");
+        			}
+        			else
+        			{
+        				vosk_recognizer_set_sample_format(rec_, "PCM16SE");
+        			}
         		}
         		else
         		{
