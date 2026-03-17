@@ -198,18 +198,18 @@ public:
     	{
     		// JSON commands parser (new)
     		
-    		std::bitset<9> valids = getValids();
+    		std::bitset<9> valids = cmds_.getValids();
     		
     		// check all supported options and call appropriate APIs
     		
     		// frequent messages first
     		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::TIMESTAMP)) == true)
     		{
-    			audio_timestamp ts = cmds.getAudioTimestamp();
+    			audio_timestamp ts = cmds_.getAudioTimestamp();
     			struct timeval tv;
     			tv.tv_sec  = ts.seconds;
     			tv.tv_usec = ts.milliseconds * 1000;
-    			std::cout << "JSON Config: timestamp=" << tv.tv_sec "s " << tv.tv_usec << "us" << std::endl;
+    			std::cout << "JSON Config: timestamp=" << tv.tv_sec << "s " << tv.tv_usec << "us" << std::endl;
     			vosk_recognizer_set_timestamp(rec_, &tv);
     			return Chunk{vosk_recognizer_partial_result(rec_), false};
     		}
@@ -246,7 +246,7 @@ public:
     		if (valids.test(static_cast<std::size_t>(ValidBitsPositions::FORMAT)) == true)
     		{
     			SampleFormat fmt = cmds_.getSampleFormat();
-    			std::cout << "JSON Config: format=" << fmt << std::endl;
+    			std::cout << "JSON Config: format=" << static_cast<std::size_t>(fmt) << std::endl;
     			vosk_recognizer_set_sample_format(rec_, (fmt == SampleFormat::ULAW) ? "ULAW" : "PCMS16LE"); 
     			return Chunk{vosk_recognizer_partial_result(rec_), false};
     		}
@@ -259,6 +259,8 @@ public:
     			return Chunk{vosk_recognizer_partial_result(rec_), false};
     		}
     		
+    		std::cout << "JSON Config: no recognized parameters detected!" << std::endl;
+    		return Chunk{vosk_recognizer_partial_result(rec_), false};
     	}
     	else if (len < 100)
     	{
