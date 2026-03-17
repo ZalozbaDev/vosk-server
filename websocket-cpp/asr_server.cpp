@@ -260,6 +260,13 @@ public:
     		}
     		
     		std::cout << "JSON Config: no recognized parameters detected!" << std::endl;
+    		
+    		char buf[len+1];
+    		memcpy(buf,message,len);
+    		buf[len]='\0';
+    		
+    		std::cout << "raw JSON: " << buf << std::endl;
+    		
     		return Chunk{vosk_recognizer_partial_result(rec_), false};
     	}
     	else if (len < 100)
