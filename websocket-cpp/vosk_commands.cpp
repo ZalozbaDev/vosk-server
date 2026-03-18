@@ -132,6 +132,21 @@ bool VoskCommands::parseCommand(const char *message, int len)
 			}
 		}
 		
+		// HACK: "buffer_size" is just the wrong word for chunklen
+		// TBD remove me!
+		if (parser_res["config"].contains("buffer_size"))
+		{
+			if (parser_res["config"]["buffer_size"].is_number_unsigned())
+			{
+				chunklen = parser_res["config"]["buffer_size"].get<unsigned int>();
+				valids.set(static_cast<std::size_t>(ValidBitsPositions::CHUNKLEN));
+			}
+			else
+			{
+				chunklen = std::numeric_limits<unsigned int>::max();
+			}
+		}
+		
 		
 	}
 	
